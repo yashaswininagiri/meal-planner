@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#246b52">
+  <title>Meal Planner</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#"><span class="brand-mark">✦</span> Meal Planner</a>
+    <nav><button class="nav-btn active" data-view="planner">My week</button><button class="nav-btn" data-view="recipes">Recipes</button><button class="nav-btn" data-view="groceries">Grocery list</button></nav>
+    <div class="account"><span id="user-label">Not signed in</span><button id="logout-btn" class="button ghost hidden">Log out</button></div>
+  </header>
+  <main class="container">
+    <section id="auth-view" class="auth-layout">
+      <div class="hero">
+        <p class="eyebrow">PLAN WELL · EAT WELL</p>
+        <h1>A calmer week<br>starts with a plan.</h1>
+        <p>Keep your recipes, weekly meals, and grocery list together in one simple place.</p>
+        <div class="hero-pills"><span>Weekly planner</span><span>Recipe box</span><span>Shopping list</span></div>
+      </div>
+      <div class="panel auth-panel">
+        <div class="tabs"><button class="tab active" data-auth="login">Log in</button><button class="tab" data-auth="signup">Create account</button></div>
+        <h2 id="auth-heading">Welcome back</h2><p class="muted" id="auth-subheading">Log in to see your meal plan.</p>
+        <form id="auth-form">
+          <label>Email address<input type="email" id="auth-email" required autocomplete="email" placeholder="you@example.com"></label>
+          <label>Password<input type="password" id="auth-password" required minlength="6" autocomplete="current-password" placeholder="At least 6 characters"></label>
+          <button class="button primary full" id="auth-submit" type="submit">Log in</button>
+        </form>
+        <p class="small muted">Your recipes and plans are saved to your account.</p>
+      </div>
+    </section>
+
+    <section id="app-view" class="hidden">
+      <div class="page-heading"><div><p class="eyebrow">YOUR KITCHEN, ORGANIZED</p><h1 id="page-title">Your meal plan</h1><p class="muted">Make a plan that works for your week.</p></div><button id="add-recipe-top" class="button primary">＋ Add recipe</button></div>
+      <div id="notice" class="notice hidden" role="status"></div>
+
+      <section id="planner-view" class="view">
+        <div class="section-heading"><div><h2>This week's menu</h2><p class="muted">Choose a recipe for each meal.</p></div><button id="clear-week" class="button ghost">Clear week</button></div>
+        <div id="week-grid" class="week-grid"></div>
+      </section>
+
+      <section id="recipes-view" class="view hidden">
+        <div class="section-heading"><div><h2>Your recipe box</h2><p class="muted">Save favourite meals for easy planning.</p></div><input id="recipe-search" class="search" type="search" placeholder="Search recipes…"></div>
+        <div id="recipe-grid" class="recipe-grid"></div>
+        <div id="recipe-empty" class="empty hidden"><span>🥗</span><h3>Your recipe box is empty</h3><p>Add your first recipe to start planning.</p><button class="button primary" data-open-recipe>Add a recipe</button></div>
+      </section>
+
+      <section id="groceries-view" class="view hidden">
+        <div class="section-heading"><div><h2>Grocery list</h2><p class="muted">Add items you need for the week and tick them off as you shop.</p></div><button id="clear-checked" class="button ghost">Remove checked</button></div>
+        <form id="grocery-form" class="inline-form"><input id="grocery-name" required maxlength="120" placeholder="e.g. tomatoes"><input id="grocery-quantity" maxlength="80" placeholder="Quantity (e.g. 4)"><button class="button primary" type="submit">Add item</button></form>
+        <div id="grocery-list" class="grocery-list"></div>
+      </section>
+    </section>
+  </main>
+
+  <dialog id="recipe-dialog" class="dialog">
+    <form id="recipe-form" method="dialog">
+      <div class="dialog-head"><div><p class="eyebrow">RECIPE BOX</p><h2 id="recipe-dialog-title">Add a recipe</h2></div><button type="button" class="icon-button" id="close-recipe" aria-label="Close">✕</button></div>
+      <input type="hidden" id="recipe-id">
+      <label>Recipe name<input id="recipe-name" required maxlength="120" placeholder="e.g. Vegetable pulao"></label>
+      <div class="two-col"><label>Category<select id="recipe-category"><option>Breakfast</option><option>Lunch</option><option>Dinner</option><option>Snack</option><option>Dessert</option></select></label><label>Prep time (minutes)<input id="recipe-time" type="number" min="0" max="1440" value="20" required></label></div>
+      <label>Ingredients <span class="muted">(one per line)</span><textarea id="recipe-ingredients" rows="4" required maxlength="5000" placeholder="1 cup rice&#10;1 onion&#10;Salt"></textarea></label>
+      <label>Instructions<textarea id="recipe-instructions" rows="3" maxlength="5000" placeholder="Brief cooking steps"></textarea></label>
+      <div class="dialog-actions"><button type="button" id="cancel-recipe" class="button ghost">Cancel</button><button type="submit" class="button primary">Save recipe</button></div>
+    </form>
+  </dialog>
+  <div id="confirm-dialog" class="toast hidden" role="alert"></div>
+  <script src="app.js" defer></script>
+</body>
+</html>

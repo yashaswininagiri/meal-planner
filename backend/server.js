@@ -1,0 +1,28 @@
+require("dotenv").config();
+const path = require("path");
+const express = require("express");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
+const { admin } = require("./supabase");
+const { requireAuth } = require("./middleware/auth");
+const authRoutes = require("./routes/auth");
+const recipeRoutes = require("./routes/recipes");
+const planRoutes = require("./routes/plans");
+const groceryRoutes = require("./routes/groceries");
+
+const app = express();
+app.disable("x-powered-by");
+app.use(helmet({ contentSecurityPolicy: { directives: { defaultSrc: ["'self'"], scriptSrc: ["'self'"], styleSrc: ["'self'"], imgSrc: ["'self'", "data:"], connectSrc: ["'self'"], objectSrc: ["'none'"], frameAncestors: ["'none'"] } } }));
+app.use(express.json({ limit: "20kb" }));
+app.use("/api/auth", rateLimit({ windowMs: 15 * 60 * 1000, limit: 30, standardHeaders: "draft-7", legacyHeaders: false }));
+app.use("/api/auth", authRoutes);
+app.get("/api/health", (_req,res)=>res.json({status:"ok"}));
+app.get("/api/me",requireAuth,(req,res)=>res.json({user:{id:req.user.id,email:req.user.email}}));
+app.use("/api/recipes",recipeRoutes);
+app.use("/api/plans",planRoutes);
+app.use("/api/groceries",groceryRoutes);
+app.use(express.static(path.join(__dirname,"..","frontend")));
+app.use((req,res)=>{if(req.path.startsWith("/api/"))return res.status(404).json({error:"API endpoint not found."});res.status(404).send("Page not found.");});
+app.use((err,_req,res,_next)=>{console.error("Request failed:",err.message);res.status(500).json({error:"Something went wrong. Check the server configuration and try again."});});
+const port=Number(process.env.PORT)||3000;
+app.listen(port,()=>console.log(`Meal Planner running at http://localhost:${port}`));

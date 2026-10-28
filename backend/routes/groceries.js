@@ -1,0 +1,11 @@
+const express = require("express");
+const { admin } = require("../supabase");
+const { requireAuth } = require("../middleware/auth");
+const router = express.Router();
+router.use(requireAuth);
+router.get("/",async(req,res,next)=>{try{const {data,error}=await admin.from("grocery_items").select("*").eq("user_id",req.user.id).order("created_at");if(error)throw error;res.json({items:data});}catch(e){next(e);}});
+router.post("/",async(req,res,next)=>{try{const {name,quantity=""}=req.body||{};if(typeof name!=="string"||!name.trim()||name.trim().length>120||typeof quantity!=="string"||quantity.length>80)return res.status(400).json({error:"Enter an item name (up to 120 characters) and a quantity (up to 80 characters)."});const {data,error}=await admin.from("grocery_items").insert({user_id:req.user.id,name:name.trim(),quantity:quantity.trim()}).select().single();if(error)throw error;res.status(201).json({item:data});}catch(e){next(e);}});
+router.patch("/:id",async(req,res,next)=>{try{if(typeof req.body?.is_checked!=="boolean")return res.status(400).json({error:"is_checked must be true or false."});const {data,error}=await admin.from("grocery_items").update({is_checked:req.body.is_checked}).eq("id",req.params.id).eq("user_id",req.user.id).select().maybeSingle();if(error)throw error;if(!data)return res.status(404).json({error:"Grocery item not found."});res.json({item:data});}catch(e){next(e);}});
+router.delete("/checked",async(req,res,next)=>{try{const {error}=await admin.from("grocery_items").delete().eq("user_id",req.user.id).eq("is_checked",true);if(error)throw error;res.json({success:true});}catch(e){next(e);}});
+router.delete("/:id",async(req,res,next)=>{try{const {data,error}=await admin.from("grocery_items").delete().eq("id",req.params.id).eq("user_id",req.user.id).select("id");if(error)throw error;if(!data.length)return res.status(404).json({error:"Grocery item not found."});res.json({success:true});}catch(e){next(e);}});
+module.exports=router;
